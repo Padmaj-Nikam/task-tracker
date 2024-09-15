@@ -35,10 +35,34 @@ class TaskController extends Controller
             'task_name' => $request->input('task_name'),
             'description' => $request->input('task_description'),
             'due_date' => $request->input('due_date'),
+            'user_id' => auth()->id(),
         ]);
 
         // Redirect back to the tasks index with a success message
         return redirect()->route('tasks.index')->with('success', 'Task created successfully');
+    }
+
+    public function update(){
+
+    }
+
+    public function destroy(Task $task){
+
+        $task = Task::findOrFail($task->id);
+        $task->delete();
+
+        return redirect()->route('task.index')->with('success', 'Task deleted successfully');
+    }
+
+    public function viewTasksInRange(Request $request){
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
+
+        $tasks = Task::whereBetween('due_date', [$start_date, $end_date])
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        return view('task-views.mytasks', compact('tasks'));
     }
 }
 
